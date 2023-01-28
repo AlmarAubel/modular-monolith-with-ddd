@@ -11,18 +11,29 @@ services:
     networks:
       - starfish-crm-network
     environment:
-      - Meetings_MeetingsConnectionString=Server=mymeetingsdb,1433;Database=MyMeetings;User=sa;Password=Test@12345
+      - Meetings_MeetingsConnectionString=Server=mymeetingsdb,1433;Database=MyMeetings;User=sa;Password=Test@12345;TrustServerCertificate=True
     depends_on:
       - migrator
     restart: on-failure
-
   mymeetingsdb:
-    build: ./src/Database/
+    image: mcr.microsoft.com/azure-sql-edge:latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Test@12345
+      - MSSQL_PID=Developer
+      - MSSQL_TCP_PORT=1433
     ports:
       - 1445:1433
     networks:
       - starfish-crm-network
-
+  dbcreator:
+    build:
+      context: ./src/Database/
+      dockerfile: Dockerfile_DatabaseCreator
+    networks:
+      - starfish-crm-network
+    depends_on:
+      - mymeetingsdb
   migrator:
     container_name: mymeetings_db_migrator
     build:
@@ -31,7 +42,7 @@ services:
     networks:
       - starfish-crm-network
     environment:
-      - ASPNETCORE_MyMeetings_IntegrationTests_ConnectionString=Server=mymeetingsdb,1433;Database=MyMeetings;User=sa;Password=Test@12345
+      - ASPNETCORE_MyMeetings_IntegrationTests_ConnectionString=Server=mymeetingsdb,1433;Database=MyMeetings;User=sa;Password=Test@12345;TrustServerCertificate=True
     command:
       [
         "./wait-for-it.sh",

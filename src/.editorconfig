@@ -1,4 +1,9 @@
-﻿[*.cs]
+﻿
+# Unix-style newlines with a newline ending every file
+[*]
+end_of_line = lf
+
+[*.cs]
 
 # SA1309: Field names should not begin with underscore
 dotnet_diagnostic.SA1309.severity = none

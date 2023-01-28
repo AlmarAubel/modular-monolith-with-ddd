@@ -1,19 +1,12 @@
 #!/bin/bash
+echo "$MSSQL_SA_PASSWORD"
+echo 'Waiting for SQL server started.';
 
-echo 'Starting sql server..' ;
+sleep 20 ;
 
-# Start SQL Server
-/opt/mssql/bin/sqlservr &
-
-echo 'SQL server started.';
-
-sleep 30 ;
-
-echo 'Create database..' ;
+echo 'Create database..';
 
 # Create database
-/opt/mssql-tools/bin/sqlcmd -d master -i /scripts/CreateDatabase_Linux.sql -U sa -P Test@12345 ;
+/opt/mssql-tools/bin/sqlcmd -S mymeetingsdb -d master -i /scripts/CreateDatabase_Linux.sql -U sa -P Test@12345 ;
 
-echo 'Database created' ;
-
-tail -f /dev/null
+echo 'Database created';
