@@ -34,7 +34,7 @@ namespace CompanyName.MyMeetings.Modules.Meetings.IntegrationTests.SeedWork
         {
             const string connectionStringEnvironmentVariable =
                 "ASPNETCORE_MyMeetings_IntegrationTests_ConnectionString";
-            ConnectionString = EnvironmentVariablesProvider.GetVariable(connectionStringEnvironmentVariable);
+            ConnectionString = TestSetup.ConnectionString ?? EnvironmentVariablesProvider.GetVariable(connectionStringEnvironmentVariable);
             if (ConnectionString == null)
             {
                 throw new ApplicationException(
