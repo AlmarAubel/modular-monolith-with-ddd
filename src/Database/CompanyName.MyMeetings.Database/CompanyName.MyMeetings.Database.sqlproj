@@ -152,7 +152,6 @@
     <Build Include="Structure\users\Views\v_UserRoles.sql" />
     <Build Include="Structure\users\Views\v_Users.sql" />
     <None Include="Scripts\CreateStructure.sql" />
-    <None Include="Scripts\Migrations\1_0_0_0\0001_create_database_linux.sql" />
     <None Include="Scripts\SeedDatabase.sql" />
     <None Include="Scripts\CreateDatabase_Linux.sql" />
     <None Include="Scripts\Migrations\1_0_0_0\0001_initial_structure.sql" />

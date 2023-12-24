@@ -6,15 +6,8 @@ namespace DatabaseMigrator;
 
 public static class DbMigrator
 {
-    public static bool Migrate(string connectionString, string scriptsPath, ILogger logger, MigrationOptions options = null)
+    public static bool Migrate(string connectionString, string scriptsPath, ILogger logger)
     {
-        options ??= new MigrationOptions();
-
-        if (options.CreateDabaseIfNotExists)
-        {
-            EnsureDatabase.For.SqlDatabase(connectionString);
-        }
-
         if (!Directory.Exists(scriptsPath))
         {
             logger.Information($"Directory {scriptsPath} does not exist");
@@ -31,20 +24,18 @@ public static class DbMigrator
                     IncludeSubDirectories = true
                 })
                 .LogTo(serilogUpgradeLog)
-                .JournalToSqlTable("dbo", "MigrationsJournal")
+                .JournalToSqlTable("app", "MigrationsJournal")
                 .Build();
 
         var result = upgrader.PerformUpgrade();
 
         if (!result.Successful)
         {
-            logger.Information("Migration failed");
-
+            logger.Information("Migration failed. Message: {Message}", result.Error.Message);
             return false;
         }
 
         logger.Information("Migration successful");
-
         return true;
     }
 }

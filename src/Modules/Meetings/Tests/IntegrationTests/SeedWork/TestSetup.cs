@@ -33,14 +33,15 @@ public class TestSetup
     [OneTimeSetUp]
     public async Task RunBeforeAnyTests()
     {
-        Trace.Listeners.Add(new ConsoleTraceListener());
         await _sqlEdgeContainer.StartAsync();
         ConnectionString = _sqlEdgeContainer.GetConnectionString();
 
         var solutionRoot = FindSolutionRoot();
+        await CreateAppSchema();
 
-        // CreateDatabase(solutionRoot);
-        var result = DbMigrator.Migrate(ConnectionString, $"{solutionRoot}/Database/CompanyName.MyMeetings.Database/Scripts/Migrations", _logger, new MigrationOptions { CreateDabaseIfNotExists = true });
+        var scriptsPath = $"{solutionRoot}/Database/CompanyName.MyMeetings.Database/Scripts/Migrations";
+        var result = DbMigrator.Migrate(ConnectionString, scriptsPath, _logger);
+
         if (!result)
         {
             throw new ApplicationException("Database migration failed");
@@ -50,9 +51,20 @@ public class TestSetup
     [OneTimeTearDown]
     public Task RunAfterAnyTests() => _sqlEdgeContainer?.DisposeAsync().AsTask();
 
+    private async Task CreateAppSchema()
+    {
+        var sqlScript = "CREATE SCHEMA app AUTHORIZATION dbo";
+
+        await using var connection = new SqlConnection(ConnectionString);
+        await connection.OpenAsync();
+
+        await using var command = new SqlCommand(sqlScript, connection);
+        await command.ExecuteNonQueryAsync();
+    }
+
     private string FindSolutionRoot()
     {
-        // todo find a nice way to get the solution root dir
+        // todo find a better way to get the solution root dir
         var currentDirectory = new DirectoryInfo(TestContext.CurrentContext.TestDirectory);
         while (currentDirectory != null && !File.Exists(Path.Combine(currentDirectory.FullName, "CompanyName.MyMeetings.sln")))
         {
