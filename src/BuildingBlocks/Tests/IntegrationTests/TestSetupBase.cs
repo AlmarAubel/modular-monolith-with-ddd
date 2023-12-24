@@ -1,25 +1,22 @@
-using System.Diagnostics;
 using DatabaseMigrator;
 using Microsoft.Data.SqlClient;
 using NUnit.Framework;
 using Serilog;
 using Testcontainers.SqlEdge;
 
-// Note A SetUpFixture in a namespace will apply tests to that exact namespace only, and not to any namespaces below it.
-namespace CompanyName.MyMeetings.Modules.Meetings.IntegrationTests;
+namespace CompanyName.MyMeetings.BuildingBlocks.IntegrationTests;
 
-[SetUpFixture]
-public class TestSetup
+public class TestSetupBase
 {
     private SqlEdgeContainer _sqlEdgeContainer;
     private ILogger _logger;
 
     public static string ConnectionString { get; private set; }
 
-    public TestSetup()
+    public TestSetupBase()
     {
         _sqlEdgeContainer = new SqlEdgeBuilder()
-            .WithImage("mcr.microsoft.com/azure-sql-edge:1.0.7")
+            .WithImage("mcr.microsoft.com/azure-sql-edge:latest")
             .Build();
 
         _logger = new LoggerConfiguration()
