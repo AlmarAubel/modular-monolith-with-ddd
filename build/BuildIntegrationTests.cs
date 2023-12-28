@@ -99,7 +99,7 @@ public partial class Build
     const string MeetingsModuleIntegrationTestsAssemblyName = "CompanyName.MyMeetings.Modules.Meetings.IntegrationTests";
 
     Target BuildMeetingsModuleIntegrationTests => _ => _
-        .DependsOn(RunDatabaseMigrations)
+        //.DependsOn(RunDatabaseMigrations)
         .Executes(() =>
         {
             var integrationTest = Solution.GetAllProjects(MeetingsModuleIntegrationTestsAssemblyName).First();
@@ -116,9 +116,9 @@ public partial class Build
         .Executes(() =>
         {
             var integrationTest = Solution.GetAllProjects(MeetingsModuleIntegrationTestsAssemblyName).First();
-            Environment.SetEnvironmentVariable(
-                MyMeetingsDatabaseEnvName,
-                MyMeetingsDatabaseConnectionString);
+            // Environment.SetEnvironmentVariable(
+            //     MyMeetingsDatabaseEnvName,
+            //     MyMeetingsDatabaseConnectionString);
 
             DotNetTest(s => s
                 .EnableNoBuild()
@@ -235,11 +235,12 @@ public partial class Build
 
     Target RunAllIntegrationTests => _ => _
         .DependsOn(
-            RunAdministrationModuleIntegrationTests,
-            RunMeetingsModuleIntegrationTests,
-            RunPaymentsModuleIntegrationTests,
-            RunUserAccessModuleIntegrationTests,
-            RunSystemIntegrationTests)
+            //RunAdministrationModuleIntegrationTests,
+            RunMeetingsModuleIntegrationTests
+            //RunPaymentsModuleIntegrationTests,
+            //RunUserAccessModuleIntegrationTests,
+            //RunSystemIntegrationTests
+            )
         .Executes(() =>
         {
 

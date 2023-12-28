@@ -73,7 +73,6 @@
     <Folder Include="Scripts" />
     <Folder Include="Scripts\Migrations" />
     <Folder Include="Scripts\Seeds" />
-    <Folder Include="Scripts\Migrations\1_0_0_0\" />
     <Folder Include="Structure\administration\" />
     <Folder Include="Structure\administration\Tables\" />
     <Folder Include="Structure\administration\Views\" />

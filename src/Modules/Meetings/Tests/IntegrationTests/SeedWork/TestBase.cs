@@ -21,8 +21,6 @@ namespace CompanyName.MyMeetings.Modules.Meetings.IntegrationTests.SeedWork
     {
         protected string ConnectionString { get; private set; }
 
-        protected ILogger Logger { get; private set; }
-
         protected IMeetingsModule MeetingsModule { get; private set; }
 
         protected IEmailSender EmailSender { get; private set; }
@@ -32,33 +30,20 @@ namespace CompanyName.MyMeetings.Modules.Meetings.IntegrationTests.SeedWork
         [SetUp]
         public async Task BeforeEachTest()
         {
-            const string connectionStringEnvironmentVariable =
-                "ASPNETCORE_MyMeetings_IntegrationTests_ConnectionString";
-            ConnectionString = EnvironmentVariablesProvider.GetVariable(connectionStringEnvironmentVariable);
-            if (ConnectionString == null)
-            {
-                throw new ApplicationException(
-                    $"Define connection string to integration tests database using environment variable: {connectionStringEnvironmentVariable}");
-            }
+            ConnectionString = TestSetup.ConnectionString;
 
-            using (var sqlConnection = new SqlConnection(ConnectionString))
+            using (var sqlConnection = new SqlConnection(TestSetup.ConnectionString))
             {
                 await ClearDatabase(sqlConnection);
             }
 
-            Logger = new LoggerConfiguration()
-                .Enrich.FromLogContext()
-                .WriteTo.Console(
-                    outputTemplate:
-                    "[{Timestamp:HH:mm:ss} {Level:u3}] [{Module}] [{Context}] {Message:lj}{NewLine}{Exception}")
-                .CreateLogger();
             EmailSender = Substitute.For<IEmailSender>();
             ExecutionContext = new ExecutionContextMock(Guid.NewGuid());
 
             MeetingsStartup.Initialize(
                 ConnectionString,
                 ExecutionContext,
-                Logger,
+                TestSetup.Logger,
                 new EmailsConfiguration("from@email.com"),
                 new EventsBusMock());
 
