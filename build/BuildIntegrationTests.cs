@@ -99,7 +99,7 @@ public partial class Build
     const string MeetingsModuleIntegrationTestsAssemblyName = "CompanyName.MyMeetings.Modules.Meetings.IntegrationTests";
 
     Target BuildMeetingsModuleIntegrationTests => _ => _
-        .DependsOn(RunDatabaseMigrations)
+        //.DependsOn(RunDatabaseMigrations)
         .Executes(() =>
         {
             var integrationTest = Solution.GetAllProjects(MeetingsModuleIntegrationTestsAssemblyName).First();
