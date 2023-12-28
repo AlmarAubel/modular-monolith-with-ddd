@@ -9,17 +9,25 @@ namespace CompanyName.MyMeetings.BuildingBlocks.IntegrationTests;
 public class TestSetupBase
 {
     private SqlEdgeContainer _sqlEdgeContainer;
-    private ILogger _logger;
 
     public static string ConnectionString { get; private set; }
 
+    public static ILogger Logger { get; private set; }
+
     public TestSetupBase()
     {
-        _sqlEdgeContainer = new SqlEdgeBuilder()
-            .WithImage("mcr.microsoft.com/azure-sql-edge:latest")
-            .Build();
+        const string connectionStringEnvironmentVariable =
+            "ASPNETCORE_MyMeetings_IntegrationTests_ConnectionString";
+        ConnectionString = EnvironmentVariablesProvider.GetVariable(connectionStringEnvironmentVariable);
 
-        _logger = new LoggerConfiguration()
+        if (string.IsNullOrEmpty(ConnectionString))
+        {
+            _sqlEdgeContainer = new SqlEdgeBuilder()
+                .WithImage("mcr.microsoft.com/azure-sql-edge:latest")
+                .Build();
+        }
+
+        Logger = new LoggerConfiguration()
             .Enrich.FromLogContext()
             .WriteTo.Console(
                 outputTemplate:
@@ -30,14 +38,17 @@ public class TestSetupBase
     [OneTimeSetUp]
     public async Task RunBeforeAnyTests()
     {
-        await _sqlEdgeContainer.StartAsync();
-        ConnectionString = _sqlEdgeContainer.GetConnectionString();
+        if (_sqlEdgeContainer != null)
+        {
+            await _sqlEdgeContainer.StartAsync();
+            ConnectionString = _sqlEdgeContainer.GetConnectionString();
+        }
 
         var solutionRoot = FindSolutionRoot();
         await CreateAppSchema();
 
         var scriptsPath = $"{solutionRoot}/Database/CompanyName.MyMeetings.Database/Scripts/Migrations";
-        var result = DbMigrator.Migrate(ConnectionString, scriptsPath, _logger);
+        var result = DbMigrator.Migrate(ConnectionString, scriptsPath, Logger);
 
         if (!result)
         {
